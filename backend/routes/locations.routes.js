@@ -1,30 +1,24 @@
 const express = require('express');
 const router = express.Router();
-const locationController = require('../controllers/location.controller');
-const authMiddleware = require('../middleware/auth.middleware');
 
-// Middleware d'authentification pour toutes les routes
-router.use(authMiddleware.authenticate);
+// Route GET pour récupérer toutes les positions
+router.get('/', (req, res) => {
+  res.json({ message: 'Liste des positions - à implémenter' });
+});
 
-// Enregistrer une nouvelle position
-router.post('/', locationController.recordLocation);
+// Route GET pour récupérer les dernières positions de tous les commerciaux
+router.get('/latest', (req, res) => {
+  res.json({ message: 'Dernières positions des commerciaux - à implémenter' });
+});
 
-// Récupérer la dernière position de l'utilisateur connecté
-router.get('/last', locationController.getLastLocation);
+// Route GET pour récupérer l'historique des positions d'un commercial
+router.get('/user/:userId', (req, res) => {
+  res.json({ message: `Historique des positions du commercial ${req.params.userId} - à implémenter` });
+});
 
-// Récupérer l'historique des positions de l'utilisateur connecté
-router.get('/history', locationController.getLocationHistory);
-
-// Récupérer la dernière position d'un utilisateur spécifique
-router.get('/user/:userId/last', locationController.getLastLocation);
-
-// Récupérer l'historique des positions d'un utilisateur spécifique
-router.get('/user/:userId/history', locationController.getLocationHistory);
-
-// Récupérer les dernières positions de tous les utilisateurs (réservé aux managers)
-router.get('/all', authMiddleware.authorize(['manager']), locationController.getAllLastLocations);
-
-// Trouver les utilisateurs à proximité d'un point
-router.get('/nearby', locationController.findNearbyUsers);
+// Route POST pour enregistrer une nouvelle position
+router.post('/', (req, res) => {
+  res.json({ message: 'Nouvelle position enregistrée - à implémenter', success: true });
+});
 
 module.exports = router;

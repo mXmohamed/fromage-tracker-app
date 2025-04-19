@@ -1,18 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const authController = require('../controllers/auth.controller');
-const authMiddleware = require('../middleware/auth.middleware');
 
-// Route d'inscription
-router.post('/register', authController.register);
+// Route POST pour l'authentification
+router.post('/login', (req, res) => {
+  res.json({ message: 'Authentification - à implémenter', token: 'sample-token' });
+});
 
-// Route de connexion
-router.post('/login', authController.login);
-
-// Route de déconnexion (nécessite d'être authentifié)
-router.post('/logout', authMiddleware.authenticate, authController.logout);
-
-// Route pour récupérer le profil de l'utilisateur connecté
-router.get('/profile', authMiddleware.authenticate, authController.getProfile);
+// Route POST pour l'inscription
+router.post('/register', (req, res) => {
+  res.json({ message: 'Inscription - à implémenter', success: true });
+});
 
 module.exports = router;
