@@ -1,0 +1,40 @@
+{
+  "name": "fromage-tracker-mobile",
+  "version": "1.0.0",
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "^1.21.0",
+    "@react-native-community/netinfo": "^11.3.1",
+    "@react-navigation/bottom-tabs": "^6.5.18",
+    "@react-navigation/native": "^6.1.14",
+    "@react-navigation/native-stack": "^6.9.22",
+    "axios": "^1.6.8",
+    "expo": "~50.0.14",
+    "expo-background-fetch": "~11.8.2",
+    "expo-camera": "~13.8.3",
+    "expo-image-picker": "~14.7.1",
+    "expo-location": "~16.5.5",
+    "expo-status-bar": "~1.11.1",
+    "expo-task-manager": "~11.7.4",
+    "moment": "^2.30.1",
+    "react": "18.2.0",
+    "react-native": "0.73.6",
+    "react-native-gesture-handler": "~2.14.0",
+    "react-native-maps": "1.10.0",
+    "react-native-reanimated": "~3.6.3",
+    "react-native-safe-area-context": "4.8.2",
+    "react-native-screens": "~3.29.0",
+    "react-native-svg": "14.1.0",
+    "socket.io-client": "^4.7.4"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.9"
+  },
+  "private": true
+}
