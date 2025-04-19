@@ -54,7 +54,7 @@ export const AuthProvider = ({ children }) => {
           token
         });
       } catch (error) {
-        console.error('Erreur lors de la vérification de l'authentification:', error);
+        console.error("Erreur lors de la vérification de l'authentification:", error);
         
         // Si erreur 401 (non autorisé), supprimer le token
         if (error.response && error.response.status === 401) {
