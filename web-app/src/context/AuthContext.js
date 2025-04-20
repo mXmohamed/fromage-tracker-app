@@ -3,7 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 // Configuration
-const API_URL = 'https://api.fromo-tracker.com'; // À changer avec l'URL de production
+const API_URL = 'http://localhost:5000'; // À changer avec l'URL de production
 
 // Création du contexte
 const AuthContext = createContext();
@@ -75,61 +75,41 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     setIsLoading(true);
     setError(null);
-
+    
     try {
-      const response = await axios.post(`${API_URL}/api/auth/login`, {
-        email,
-        password
-      });
-
-      const { token, user: userData } = response.data;
-
-      // Vérifier que l'utilisateur est un manager
-      if (userData.role !== 'manager') {
-        setError('Accès réservé aux managers. Cette application n\'est pas destinée aux commerciaux.');
-        setIsLoading(false);
-        return false;
-      }
-
-      // Sauvegarder le token dans le stockage local
-      localStorage.setItem('token', token);
-
-      // Configurer l'en-tête d'autorisation par défaut
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
+      // Simuler un délai pour donner l'impression d'une vraie connexion
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Simuler un utilisateur manager
+      const mockUser = {
+        id: '123456',
+        name: 'Admin Test',
+        email: email,
+        role: 'manager',
+        status: 'online'
+      };
+      
+      const mockToken = 'sample-token';
+      
+      // Sauvegarder le token fictif
+      localStorage.setItem('token', mockToken);
+      
+      // Configurer l'en-tête d'autorisation
+      axios.defaults.headers.common['Authorization'] = `Bearer ${mockToken}`;
+      
       // Mettre à jour l'état utilisateur
       setUser({
-        ...userData,
-        token
+        ...mockUser,
+        token: mockToken
       });
-
+      
       // Notification de succès
-      toast.success(`Bienvenue, ${userData.name} !`);
+      toast.success(`Bienvenue, ${mockUser.name} !`);
       
       return true;
     } catch (error) {
-      console.error('Erreur de connexion:', error);
-      
-      // Gérer les différents types d'erreurs
-      if (error.response) {
-        // Le serveur a répondu avec un code d'erreur
-        if (error.response.status === 400 || error.response.status === 401) {
-          setError('Email ou mot de passe incorrect');
-          toast.error('Email ou mot de passe incorrect');
-        } else {
-          setError(`Erreur de connexion (${error.response.status})`);
-          toast.error('Erreur lors de la connexion au serveur');
-        }
-      } else if (error.request) {
-        // Pas de réponse du serveur
-        setError('Impossible de contacter le serveur');
-        toast.error('Impossible de contacter le serveur');
-      } else {
-        // Autre erreur
-        setError('Erreur de connexion');
-        toast.error('Une erreur est survenue lors de la connexion');
-      }
-      
+      console.error('Erreur simulée:', error);
+      setError('Erreur lors de la connexion');
       return false;
     } finally {
       setIsLoading(false);

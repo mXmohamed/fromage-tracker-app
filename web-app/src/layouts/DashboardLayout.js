@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FiHome, FiMap, FiUsers, FiShoppingBag, FiGrid, FiSettings, FiMenu, FiX, FiLogOut, FiUser, FiCheese } from 'react-icons/fi';
+import { FiHome, FiMap, FiUsers, FiShoppingBag, FiGrid, FiSettings, FiMenu, FiX, FiLogOut, FiUser } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 
 const DashboardLayout = ({ children }) => {
@@ -19,7 +19,7 @@ const DashboardLayout = ({ children }) => {
     { path: '/map', icon: <FiMap size={20} />, text: 'Carte' },
     { path: '/sales', icon: <FiShoppingBag size={20} />, text: 'Ventes' },
     { path: '/team', icon: <FiUsers size={20} />, text: 'Équipe' },
-    { path: '/products', icon: <FiCheese size={20} />, text: 'Produits' },
+    { path: '/products', icon: <FiShoppingBag size={20} />, text: 'Produits' },
     { path: '/clients', icon: <FiUser size={20} />, text: 'Clients' },
     { path: '/settings', icon: <FiSettings size={20} />, text: 'Paramètres' },
   ];
@@ -41,7 +41,7 @@ const DashboardLayout = ({ children }) => {
           </div>
           
           <div className="px-6 pt-5 pb-3 flex items-center border-b border-gray-200">
-            <FiCheese className="h-8 w-8 text-yellow-600" />
+            <FiShoppingBag className="h-8 w-8 text-yellow-600" />
             <span className="text-xl font-semibold text-gray-800 ml-2">Fromage Tracker</span>
           </div>
           
@@ -71,7 +71,7 @@ const DashboardLayout = ({ children }) => {
         <div className="flex flex-col w-64">
           <div className="flex flex-col h-0 flex-1 border-r border-gray-200 bg-white">
             <div className="px-6 pt-5 pb-3 flex items-center border-b border-gray-200">
-              <FiCheese className="h-8 w-8 text-yellow-600" />
+              <FiShoppingBag className="h-8 w-8 text-yellow-600" />
               <span className="text-xl font-semibold text-gray-800 ml-2">Fromage Tracker</span>
             </div>
             <div className="flex-1 flex flex-col overflow-y-auto">
