@@ -1,255 +1,143 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { FiHome, FiMap, FiUsers, FiShoppingBag, FiGrid, FiSettings, FiMenu, FiX, FiLogOut, FiUser, FiCheese } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 
-// Icônes 
-import { 
-  FiPieChart, 
-  FiMap, 
-  FiShoppingCart, 
-  FiUsers, 
-  FiSettings, 
-  FiLogOut, 
-  FiMenu, 
-  FiX, 
-  FiUser, 
-  FiChevronDown, 
-  FiBell,
-  FiShoppingBag,
-  FiMapPin
-} from 'react-icons/fi';
-
 const DashboardLayout = ({ children }) => {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Fonction pour gérer la déconnexion
   const handleLogout = async () => {
     await logout();
     navigate('/login');
   };
 
-  // Liens de la sidebar
-  const sidebarLinks = [
-    { 
-      path: '/dashboard', 
-      name: 'Tableau de bord', 
-      icon: <FiPieChart size={20} /> 
-    },
-    { 
-      path: '/map', 
-      name: 'Carte commerciaux', 
-      icon: <FiMap size={20} /> 
-    },
-    { 
-      path: '/sales', 
-      name: 'Ventes', 
-      icon: <FiShoppingCart size={20} /> 
-    },
-    { 
-      path: '/team', 
-      name: 'Équipe', 
-      icon: <FiUsers size={20} /> 
-    },
-    { 
-      path: '/products', 
-      name: 'Produits', 
-      icon: <FiShoppingBag size={20} /> 
-    },
-    { 
-      path: '/clients', 
-      name: 'Clients', 
-      icon: <FiMapPin size={20} /> 
-    },
-    { 
-      path: '/settings', 
-      name: 'Paramètres', 
-      icon: <FiSettings size={20} /> 
-    },
+  const menuItems = [
+    { path: '/dashboard', icon: <FiHome size={20} />, text: 'Tableau de bord' },
+    { path: '/map', icon: <FiMap size={20} />, text: 'Carte' },
+    { path: '/sales', icon: <FiShoppingBag size={20} />, text: 'Ventes' },
+    { path: '/team', icon: <FiUsers size={20} />, text: 'Équipe' },
+    { path: '/products', icon: <FiCheese size={20} />, text: 'Produits' },
+    { path: '/clients', icon: <FiUser size={20} />, text: 'Clients' },
+    { path: '/settings', icon: <FiSettings size={20} />, text: 'Paramètres' },
   ];
-
-  // Liste des notifications (simulée)
-  const notifications = [
-    {
-      id: 1,
-      title: 'Nouvelle vente',
-      message: 'Sophie Martin a enregistré une vente de 450€',
-      time: 'Il y a 25 min',
-      read: false
-    },
-    {
-      id: 2,
-      title: 'Visite client',
-      message: 'Thomas Bernard a visité Fromagerie Dupont',
-      time: 'Il y a 1h',
-      read: true
-    },
-    {
-      id: 3,
-      title: 'Stock faible',
-      message: 'Le stock de Comté 18 mois est faible',
-      time: 'Il y a 2h',
-      read: true
-    }
-  ];
-
-  // Nombre de notifications non lues
-  const unreadCount = notifications.filter(notif => !notif.read).length;
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <div 
-        className={`bg-blue-800 text-white lg:w-64 ${menuOpen ? 'w-64' : 'w-0 lg:w-64'} 
-                    transition-all duration-300 fixed lg:relative h-full z-20 overflow-hidden`}
-      >
-        <div className="p-6 border-b border-blue-700">
-          <h1 className="text-2xl font-bold">FroMo Manager</h1>
-        </div>
-        
-        <nav className="mt-6">
-          {sidebarLinks.map((link) => (
-            <Link
-              key={link.path}
-              to={link.path}
-              className={`flex items-center w-full p-4 transition-colors duration-200 ${
-                location.pathname === link.path ? 'bg-blue-700' : 'hover:bg-blue-700'
-              }`}
+    <div className="h-screen flex overflow-hidden bg-gray-50">
+      {/* Sidebar mobile */}
+      <div className={`fixed inset-0 z-40 md:hidden ${sidebarOpen ? 'block' : 'hidden'}`}>
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)}></div>
+        <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white">
+          <div className="absolute top-0 right-0 -mr-12 pt-2">
+            <button
+              className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+              onClick={() => setSidebarOpen(false)}
             >
-              <span className="mr-4">{link.icon}</span>
-              <span>{link.name}</span>
-            </Link>
-          ))}
-        </nav>
-        
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-blue-700">
-          <button 
-            className="flex items-center text-white opacity-75 hover:opacity-100"
-            onClick={handleLogout}
-          >
-            <FiLogOut size={20} className="mr-3" />
-            Déconnexion
-          </button>
+              <span className="sr-only">Fermer le menu</span>
+              <FiX className="h-6 w-6 text-white" />
+            </button>
+          </div>
+          
+          <div className="px-6 pt-5 pb-3 flex items-center border-b border-gray-200">
+            <FiCheese className="h-8 w-8 text-yellow-600" />
+            <span className="text-xl font-semibold text-gray-800 ml-2">Fromage Tracker</span>
+          </div>
+          
+          <div className="mt-5 flex-1 h-0 overflow-y-auto">
+            <nav className="px-3 space-y-1">
+              {menuItems.map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`group flex items-center px-4 py-3 text-sm font-medium rounded-md ${
+                    location.pathname === item.path
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <span className="mr-3">{item.icon}</span>
+                  {item.text}
+                </Link>
+              ))}
+            </nav>
+          </div>
         </div>
       </div>
-      
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top Navigation */}
-        <header className="bg-white shadow-sm z-10">
-          <div className="flex items-center justify-between p-4">
-            <div className="flex items-center space-x-3">
-              <button 
-                onClick={() => setMenuOpen(!menuOpen)} 
-                className="lg:hidden text-gray-600 focus:outline-none"
-              >
-                {menuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
-              </button>
-              <h2 className="text-xl font-semibold text-gray-800">
-                {sidebarLinks.find(link => link.path === location.pathname)?.name || 'Dashboard'}
-              </h2>
+
+      {/* Sidebar desktop */}
+      <div className="hidden md:flex md:flex-shrink-0">
+        <div className="flex flex-col w-64">
+          <div className="flex flex-col h-0 flex-1 border-r border-gray-200 bg-white">
+            <div className="px-6 pt-5 pb-3 flex items-center border-b border-gray-200">
+              <FiCheese className="h-8 w-8 text-yellow-600" />
+              <span className="text-xl font-semibold text-gray-800 ml-2">Fromage Tracker</span>
             </div>
-            
-            <div className="flex items-center space-x-4">
-              {/* Notifications */}
-              <div className="relative">
-                <button 
-                  className="text-gray-500 relative"
-                  onClick={() => setNotificationsOpen(!notificationsOpen)}
-                >
-                  <FiBell size={24} />
-                  {unreadCount > 0 && (
-                    <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
-                  )}
-                </button>
-                
-                {/* Dropdown Notifications */}
-                {notificationsOpen && (
-                  <div className="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg overflow-hidden z-20">
-                    <div className="py-2 px-3 bg-gray-100 border-b border-gray-200">
-                      <div className="flex justify-between items-center">
-                        <h3 className="text-sm font-semibold">Notifications</h3>
-                        <span className="text-xs text-blue-600 cursor-pointer">Marquer tout comme lu</span>
-                      </div>
-                    </div>
-                    <div className="max-h-96 overflow-y-auto">
-                      {notifications.map(notification => (
-                        <div 
-                          key={notification.id}
-                          className={`px-4 py-3 hover:bg-gray-50 border-b border-gray-100 ${
-                            !notification.read ? 'bg-blue-50' : ''
-                          }`}
-                        >
-                          <div className="flex justify-between">
-                            <p className="text-sm font-medium text-gray-900">{notification.title}</p>
-                            <p className="text-xs text-gray-500">{notification.time}</p>
-                          </div>
-                          <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="py-2 px-3 bg-gray-100 text-xs text-center text-gray-600 border-t border-gray-200">
-                      Voir toutes les notifications
-                    </div>
+            <div className="flex-1 flex flex-col overflow-y-auto">
+              <nav className="flex-1 px-3 py-4 space-y-1">
+                {menuItems.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`group flex items-center px-4 py-3 text-sm font-medium rounded-md ${
+                      location.pathname === item.path
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    <span className="mr-3">{item.icon}</span>
+                    {item.text}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+            <div className="p-4 border-t border-gray-200">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center px-4 py-2 text-sm text-red-600 rounded-md hover:bg-red-50"
+              >
+                <FiLogOut className="mr-3 h-5 w-5" />
+                Déconnexion
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main content */}
+      <div className="flex flex-col w-0 flex-1 overflow-hidden">
+        <div className="relative z-10 flex-shrink-0 flex h-16 bg-white shadow">
+          <button
+            className="px-4 border-r border-gray-200 text-gray-500 md:hidden"
+            onClick={() => setSidebarOpen(true)}
+          >
+            <span className="sr-only">Ouvrir le menu</span>
+            <FiMenu className="h-6 w-6" />
+          </button>
+          <div className="flex-1 px-4 flex justify-between">
+            <div className="flex-1 flex items-center">
+              <h1 className="text-lg font-semibold text-gray-800">
+                {menuItems.find(item => item.path === location.pathname)?.text || 'Fromage Tracker'}
+              </h1>
+            </div>
+            <div className="ml-4 flex items-center md:ml-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white">
+                    {user?.name?.charAt(0) || 'U'}
                   </div>
-                )}
-              </div>
-              
-              {/* Profile Dropdown */}
-              <div className="relative">
-                <button 
-                  className="flex items-center space-x-2"
-                  onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                >
-                  <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white">
-                    {user?.name?.charAt(0) || 'M'}
-                  </div>
-                  <span className="hidden md:inline-block font-medium">{user?.name || 'Manager'}</span>
-                  <FiChevronDown size={16} className="text-gray-500" />
-                </button>
-                
-                {/* Dropdown Menu */}
-                {profileDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg overflow-hidden z-20">
-                    <div className="py-2">
-                      <Link 
-                        to="/profile" 
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={() => setProfileDropdownOpen(false)}
-                      >
-                        <FiUser className="inline mr-2" />
-                        Mon Profil
-                      </Link>
-                      <Link 
-                        to="/settings" 
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={() => setProfileDropdownOpen(false)}
-                      >
-                        <FiSettings className="inline mr-2" />
-                        Paramètres
-                      </Link>
-                      <div className="border-t border-gray-100 my-1"></div>
-                      <button 
-                        onClick={handleLogout}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        <FiLogOut className="inline mr-2" />
-                        Déconnexion
-                      </button>
-                    </div>
-                  </div>
-                )}
+                </div>
+                <div className="ml-3">
+                  <div className="text-sm font-medium text-gray-700">{user?.name || 'Utilisateur'}</div>
+                  <div className="text-xs text-gray-500">Manager</div>
+                </div>
               </div>
             </div>
           </div>
-        </header>
-        
-        {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-4">
+        </div>
+
+        <main className="flex-1 relative overflow-y-auto focus:outline-none p-4">
           {children}
         </main>
       </div>
