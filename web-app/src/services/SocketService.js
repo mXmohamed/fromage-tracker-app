@@ -1,28 +1,20 @@
 import { io } from 'socket.io-client';
+import { toast } from 'react-toastify';
 
 // Configuration
 const API_URL = 'https://api.fromo-tracker.com'; // À changer avec l'URL de production
 
-// Instance de socket.io
+// Socket.io singleton
 let socket = null;
 
-// Liste des callbacks pour les événements
-const eventCallbacks = {
-  position_updated: [],
-  visit_started: [],
-  visit_completed: [],
-  new_sale: []
-};
-
 /**
- * Initialiser la connexion socket
- * @param {String} token Token d'authentification JWT
- * @returns {Object} Instance socket.io
+ * Initialise la connexion socket
+ * @param {string} token - Token d'authentification
+ * @returns {object} - Instance socket.io
  */
 export const initializeSocket = (token) => {
-  if (socket) {
-    // Déconnecter l'ancienne instance
-    socket.disconnect();
+  if (socket && socket.connected) {
+    return socket;
   }
 
   // Créer une nouvelle connexion
@@ -30,140 +22,87 @@ export const initializeSocket = (token) => {
     auth: {
       token
     },
-    transports: ['websocket', 'polling'],
     reconnection: true,
-    reconnectionAttempts: Infinity,
-    reconnectionDelay: 1000,
-    reconnectionDelayMax: 5000,
-    timeout: 20000
+    reconnectionAttempts: 5,
+    reconnectionDelay: 3000
   });
 
-  // Écouter les événements de connexion
+  // Événements de connexion
   socket.on('connect', () => {
-    console.log('Connexion socket.io établie');
+    console.log('Socket.io connecté');
+  });
+
+  socket.on('connect_error', (error) => {
+    console.error('Erreur de connexion socket:', error.message);
+    toast.error('Problème de connexion aux mises à jour en temps réel');
   });
 
   socket.on('disconnect', (reason) => {
-    console.log(`Déconnexion socket.io: ${reason}`);
-  });
-
-  socket.on('error', (error) => {
-    console.error('Erreur socket.io:', error);
+    console.log('Socket.io déconnecté:', reason);
+    if (reason === 'io server disconnect') {
+      // Déconnecté par le serveur, reconnexion manuelle
+      socket.connect();
+    }
   });
 
   socket.on('reconnect', (attemptNumber) => {
-    console.log(`Reconnexion socket.io réussie après ${attemptNumber} tentatives`);
+    console.log(`Socket.io reconnecté après ${attemptNumber} tentatives`);
+    toast.success('Reconnecté aux mises à jour en temps réel');
   });
 
-  socket.on('reconnect_attempt', (attemptNumber) => {
-    console.log(`Tentative de reconnexion socket.io #${attemptNumber}`);
-  });
-
-  socket.on('reconnect_error', (error) => {
-    console.error('Erreur de reconnexion socket.io:', error);
-  });
-
-  // Écouter les mises à jour de position
-  socket.on('position_updated', (data) => {
-    console.log('Position mise à jour:', data);
-    notifyCallbacks('position_updated', data);
-  });
-
-  // Écouter le début des visites
-  socket.on('visit_started', (data) => {
-    console.log('Visite démarrée:', data);
-    notifyCallbacks('visit_started', data);
-  });
-
-  // Écouter la fin des visites
-  socket.on('visit_completed', (data) => {
-    console.log('Visite terminée:', data);
-    notifyCallbacks('visit_completed', data);
-  });
-
-  // Écouter les nouvelles ventes
-  socket.on('new_sale', (data) => {
-    console.log('Nouvelle vente:', data);
-    notifyCallbacks('new_sale', data);
+  socket.on('reconnect_failed', () => {
+    console.error('Socket.io échec de reconnexion après toutes les tentatives');
+    toast.error('Impossible de se reconnecter aux mises à jour en temps réel');
   });
 
   return socket;
 };
 
 /**
- * Notifier tous les callbacks enregistrés pour un événement
- * @param {String} event Nom de l'événement
- * @param {Object} data Données de l'événement
- */
-const notifyCallbacks = (event, data) => {
-  if (eventCallbacks[event]) {
-    eventCallbacks[event].forEach(callback => {
-      try {
-        callback(data);
-      } catch (error) {
-        console.error(`Erreur dans le callback de l'événement ${event}:`, error);
-      }
-    });
-  }
-};
-
-/**
- * S'abonner à un événement
- * @param {String} event Nom de l'événement
- * @param {Function} callback Fonction de callback
- * @returns {Function} Fonction pour se désabonner
+ * S'abonne à un événement socket.io
+ * @param {string} event - Nom de l'événement
+ * @param {function} callback - Fonction de rappel
+ * @returns {function} - Fonction pour se désabonner
  */
 export const subscribeToEvent = (event, callback) => {
-  if (!eventCallbacks[event]) {
-    eventCallbacks[event] = [];
+  if (!socket) {
+    console.error('Socket.io non initialisé. Veuillez appeler initializeSocket() d\'abord');
+    return () => {};
   }
 
-  eventCallbacks[event].push(callback);
+  socket.on(event, callback);
 
   // Retourner une fonction pour se désabonner
   return () => {
-    if (eventCallbacks[event]) {
-      const index = eventCallbacks[event].indexOf(callback);
-      if (index !== -1) {
-        eventCallbacks[event].splice(index, 1);
-      }
-    }
+    socket.off(event, callback);
   };
 };
 
 /**
- * Obtenir l'instance socket.io
- * @returns {Object|null} Instance socket.io ou null si non initialisé
+ * Émet un événement via socket.io
+ * @param {string} event - Nom de l'événement
+ * @param {any} data - Données à envoyer
+ * @returns {Promise} - Promesse résolue/rejetée en fonction de la réponse
  */
-export const getSocket = () => socket;
+export const emitEvent = (event, data) => {
+  return new Promise((resolve, reject) => {
+    if (!socket) {
+      reject(new Error('Socket.io non initialisé. Veuillez appeler initializeSocket() d\'abord'));
+      return;
+    }
 
-/**
- * Déconnecter le socket
- */
-export const disconnectSocket = () => {
-  if (socket) {
-    socket.disconnect();
-    socket = null;
-  }
-
-  // Nettoyer les callbacks
-  Object.keys(eventCallbacks).forEach(event => {
-    eventCallbacks[event] = [];
+    socket.emit(event, data, (response) => {
+      if (response && response.error) {
+        reject(new Error(response.error));
+      } else {
+        resolve(response);
+      }
+    });
   });
 };
 
-/**
- * Envoyer un événement au serveur
- * @param {String} event Nom de l'événement
- * @param {Object} data Données à envoyer
- * @returns {Boolean} Succès de l'envoi
- */
-export const emitEvent = (event, data) => {
-  if (!socket || !socket.connected) {
-    console.error('Socket non connecté, impossible d\'envoyer l\'événement');
-    return false;
-  }
-
-  socket.emit(event, data);
-  return true;
+export default {
+  initializeSocket,
+  subscribeToEvent,
+  emitEvent
 };
