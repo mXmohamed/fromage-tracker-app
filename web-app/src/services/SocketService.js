@@ -2,7 +2,7 @@ import { io } from 'socket.io-client';
 import { toast } from 'react-toastify';
 
 // Configuration
-const API_URL = 'https://api.fromo-tracker.com'; // À changer avec l'URL de production
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000'; // Utiliser la variable d'environnement
 
 // Socket.io singleton
 let socket = null;
