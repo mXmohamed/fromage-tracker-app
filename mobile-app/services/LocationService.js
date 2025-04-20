@@ -6,7 +6,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 
 // Configuration
-const API_URL = 'https://api.fromo-tracker.com'; // À changer avec l'URL de production
+// Utiliser une URL qui fonctionnera sur les émulateurs et appareils réels
+const API_URL = process.env.API_URL || 'http://10.0.2.2:5000'; // 10.0.2.2 pointe vers localhost pour les émulateurs Android
 const LOCATION_TASK_NAME = 'background-location-task';
 const LOCATION_TRACKING_INTERVAL = 5 * 60 * 1000; // 5 minutes
 const LOCATION_OFFLINE_STORAGE_KEY = 'offline-locations';
