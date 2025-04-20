@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap, Circle } from 'react-le
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { toast } from 'react-toastify';
-import { FiRefreshCw, FiPlus, FiMinus, FiFilter, FiClock, FiUser, FiMapPin, FiPhone, FiMail } from 'react-icons/fi';
+import { FiRefreshCw, FiPlus, FiMinus, FiFilter, FiClock, FiUser, FiMapPin, FiPhone, FiMail, FiX } from 'react-icons/fi';
 
 // Services
 import MapService from '../../services/MapService';
