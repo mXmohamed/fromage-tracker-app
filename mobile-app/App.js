@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'expo-status-bar';
-import { Map, User, ShoppingCart, List } from 'react-native-feather';
+import { Map, User, ShoppingBag, List } from 'react-native-feather';
 
 // Screens
 import LoginScreen from './screens/LoginScreen';
@@ -37,7 +37,7 @@ const AppTabs = () => {
           } else if (route.name === 'Visites') {
             return <List stroke={color} width={size} height={size} />;
           } else if (route.name === 'Produits') {
-            return <ShoppingCart stroke={color} width={size} height={size} />;
+            return <ShoppingBag stroke={color} width={size} height={size} />;
           } else if (route.name === 'Commandes') {
             return <User stroke={color} width={size} height={size} />;
           }
